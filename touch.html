@@ -38,72 +38,79 @@
 		endX = 0,
 		endY = 0,
 		moveX = 0,
-		moveY = 0;
+		moveY = 0,
+		reg = /\-?[0-9]+\.?[0-9]*/g,
+		cssNum = 0;
+	function getCss(eles){
+		var getCssNum = eles.style.transform;
+		if(getCssNum !==''){
+			cssNum = + getCssNum.match(reg);
+		}
+	}
 	document.addEventListener('touchstart',function(e){
 		startX = e.touches[0].clientX;
 		startY = e.touches[0].clientY;
-		console.log('X轴起始的距离是:'+startX);
-		console.log('Y轴起始的距离是:'+startY);
+		e.preventDefault();
 	});
 	document.addEventListener('touchmove',function(e){
 		endX = e.touches[0].clientX;
 		endY = e.touches[0].clientY;
-		console.log('X轴移动的距离'+endX);
-		console.log('Y轴移动的距离'+endY);
+		e.preventDefault();
 	});
 	document.addEventListener('touchend',function(e){
-		console.log('X轴手指拖动距离是:'+ (endX - startX));
-		console.log('Y轴手指拖动距离是:'+ (endY - startY));
+		e.preventDefault();
 		moveX = endX - startX;
 		moveY = endY - startY;
 		e = e || window.event;
-		var reg = /\-?[0-9]+\.?[0-9]*/g;
-		var cssNum = 0;
 		var targetBox = e.target ? e.target:e.srcElement;
+		var oWidth = document.documentElement.clientWidth || document.body.clientWidth;
+		var oHeight = document.documentElement.clientHeight || document.body.clientHeight;
+		var boxWidth = targetBox.offsetWidth;
+		var boxHeight = targetBox.offsetHeight;
 		//判断手势滑动(上下手势);
 		if(moveY > 0 && moveY > 10){
 			console.log('动作是向上翻页');
-			e.preventDefault();
+			getCss(targetBox);
+			moveY = moveY + cssNum;
+			console.log(moveY);
+			targetBox.style.transform = 'translateY('+moveY+'px)';
 		}else if(moveY < 0 && moveY < -10){
 			console.log('动作是向下翻页');
-			e.preventDefault();
+			getCss(targetBox);
+			moveY = moveY + cssNum;
+			console.log(moveY);
+			targetBox.style.transform = 'translateY('+moveY+'px)';
 		}
 		//判断手势滑动(左右滑动);
 		if(moveX > 0 && moveX > 10){
 			console.log('动作是向右滑动');
-			var cssStyle = targetBox.style.transform;
-			if(cssStyle !== ''){
-				cssNum = +cssStyle.match(reg);
+			var cssStyleRight = targetBox.style.transform;
+			if(cssStyleRight !== ''){
+				cssNum = +cssStyleRight.match(reg);
 			};
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
-			e.preventDefault();
 		}else if(moveX < 0 && moveX < -10){
 			console.log('动作是向左滑动');
-			var cssStyle = targetBox.style.transform;
-			if(cssStyle !== ''){
-				cssNum = +cssStyle.match(reg);
+			var cssStyleLeft = targetBox.style.transform;
+			if(cssStyleLeft !== ''){
+				cssNum = +cssStyleLeft.match(reg);
 			}
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
-			e.preventDefault();
 		}
-		// //判断手势滑动(左上左下);
-		// if((moveX > 0 && moveY >0 ) && (moveX > 10 && moveY > 10)){
-		// 	console.log('动作是左下滑动');
-		// 	e.preventDefault();
-		// }else if((moveX > 0 && moveY < 0) && (moveX > 10 && moveY < -10)){
-		// 	console.log('动作是左上滑动');
-		// 	e.preventDefault();
-		// }
-		// //判断手势滑动(右上右下);
-		// if((moveX < 0 && moveY > 0 ) && (moveX < -10 && moveY > 10)){
-		// 	console.log('动作是右下滑动');
-		// 	e.preventDefault();
-		// }else if((moveX < 0 && moveY < 0) && (moveX < -10 && moveY < -10)){
-		// 	console.log('动作是右上滑动');
-		// 	e.preventDefault();
-		// }
+		//判断手势滑动(左上左下);
+		if((moveX > 0 && moveY >0 ) && (moveX > 10 && moveY > 10)){
+			console.log('动作是左下滑动');
+		}else if((moveX > 0 && moveY < 0) && (moveX > 10 && moveY < -10)){
+			console.log('动作是左上滑动');
+		}
+		//判断手势滑动(右上右下);
+		if((moveX < 0 && moveY > 0 ) && (moveX < -10 && moveY > 10)){
+			console.log('动作是右下滑动');
+		}else if((moveX < 0 && moveY < 0) && (moveX < -10 && moveY < -10)){
+			console.log('动作是右上滑动');
+		}
 	});
 </script>
 </html>
