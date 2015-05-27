@@ -56,6 +56,10 @@
 		console.log('Y轴手指拖动距离是:'+ (endY - startY));
 		moveX = endX - startX;
 		moveY = endY - startY;
+		e = e || window.event;
+		var reg = /\-?[0-9]+\.?[0-9]*/g;
+		var cssNum = 0;
+		var targetBox = e.target ? e.target:e.srcElement;
 		//判断手势滑动(上下手势);
 		if(moveY > 0 && moveY > 10){
 			console.log('动作是向上翻页');
@@ -67,17 +71,16 @@
 		//判断手势滑动(左右滑动);
 		if(moveX > 0 && moveX > 10){
 			console.log('动作是向右滑动');
-			e = e || window.event;
-			var targetBox = e.target ? e.target : e.srcElement;
+			var cssStyle = targetBox.style.transform;
+			if(cssStyle !== ''){
+				cssNum = +cssStyle.match(reg);
+			};
+			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
 			e.preventDefault();
 		}else if(moveX < 0 && moveX < -10){
 			console.log('动作是向左滑动');
-			var reg = /\-?[0-9]+\.?[0-9]*/g;
-			e = e || window.event;
-			var targetBox = e.target ? e.target : e.srcElement;
 			var cssStyle = targetBox.style.transform;
-			var cssNum = 0;
 			if(cssStyle !== ''){
 				cssNum = +cssStyle.match(reg);
 			}
