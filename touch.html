@@ -72,30 +72,22 @@
 			console.log('动作是向上翻页');
 			getCss(targetBox);
 			moveY = moveY + cssNum;
-			console.log(moveY);
 			targetBox.style.transform = 'translateY('+moveY+'px)';
 		}else if(moveY < 0 && moveY < -10){
 			console.log('动作是向下翻页');
 			getCss(targetBox);
 			moveY = moveY + cssNum;
-			console.log(moveY);
 			targetBox.style.transform = 'translateY('+moveY+'px)';
 		}
 		//判断手势滑动(左右滑动);
 		if(moveX > 0 && moveX > 10){
 			console.log('动作是向右滑动');
-			var cssStyleRight = targetBox.style.transform;
-			if(cssStyleRight !== ''){
-				cssNum = +cssStyleRight.match(reg);
-			};
+			getCss(targetBox);
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
 		}else if(moveX < 0 && moveX < -10){
 			console.log('动作是向左滑动');
-			var cssStyleLeft = targetBox.style.transform;
-			if(cssStyleLeft !== ''){
-				cssNum = +cssStyleLeft.match(reg);
-			}
+			getCss(targetBox);
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
 		}
