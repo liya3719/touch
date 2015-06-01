@@ -10,13 +10,19 @@
 	<style type="text/css" media="screen">
 		body,html{height:100%;}
 		.wrap{height:100%;}
-		.wrap .container{position:relative;height:100%;}
-		.wrap .container .space{width:100%;height:100%;}
-		.wrap .container .space .move{position:absolute;width:100%;height:100%;background:#fff;transition:.2s ease-in;}
+		.wrap .container{position:relative;height:100%;overflow:hidden;}
+		.wrap .container .space{width:100%;transition:.5s cubic-bezier(0.63, -0.01, 0.38, 1);}
+		.wrap .container .space .move{width:100%;background:#fff;}
 		.wrap .container .space .move:first-child{background:red;}
 		.wrap .container .space .move:nth-child(2){background:yellow;}
 		.wrap .container .space .move:nth-child(3){background:green;}
 		.wrap .container .space .move:last-child{background:blue;}
+		input[type="number"]::-webkit-inner-spin-button{
+			-webkit-appearance:none;
+		}
+		input[type="number"]::-webkit-outer-spin-button{
+			-webkit-appearance:none;
+		}
 	</style>
 </head>
 <body>
@@ -27,20 +33,34 @@
 				<div class="move"></div>
 				<div class="move"></div>
 				<div class="move"></div>
+				<div class="move"></div>
+				<div class="move"></div>
+				<div class="move"></div>
+				<div class="move"></div>
 			</div>
 		</div>
 	</div>
 </body>
 <script type="text/javascript">
-	var moveBox = document.getElementById('move-box');
 	var startX = 0,
 		startY = 0,
 		endX = 0,
 		endY = 0,
 		moveX = 0,
 		moveY = 0,
+		//匹配DOM3级的正则
 		reg = /\-?[0-9]+\.?[0-9]*/g,
+		pageNum = 0;
 		cssNum = 0;
+	var moveBox = document.getElementById('move-box');
+	var childBox = document.getElementById('move-box').getElementsByClassName('move');
+	var getLen = document.getElementById('move-box').getElementsByTagName('div').length;
+	var oWidth = document.documentElement.clientWidth || document.body.clientWidth;
+	var oHeight = document.documentElement.clientHeight || document.body.clientHeight;
+	moveBox.style.height = oHeight * getLen+'px';
+	for(var i=0,len=childBox.length;i<len;i++){
+		childBox[i].style.height = oHeight+'px';
+	}
 	function getCss(eles){
 		var getCssNum = eles.style.transform;
 		if(getCssNum !==''){
@@ -61,25 +81,38 @@
 		e.preventDefault();
 		moveX = endX - startX;
 		moveY = endY - startY;
+		upDown(e);
+	});
+	function upDown(e){
+		//判断手势滑动(上下手势);
 		e = e || window.event;
 		var targetBox = e.target ? e.target:e.srcElement;
-		var oWidth = document.documentElement.clientWidth || document.body.clientWidth;
-		var oHeight = document.documentElement.clientHeight || document.body.clientHeight;
-		var boxWidth = targetBox.offsetWidth;
-		var boxHeight = targetBox.offsetHeight;
-		//判断手势滑动(上下手势);
 		if(moveY > 0 && moveY > 10){
+			pageNum--;
 			console.log('动作是向上翻页');
-			getCss(targetBox);
-			moveY = moveY + cssNum;
-			targetBox.style.transform = 'translateY('+moveY+'px)';
+			if(pageNum < 0){
+				pageNum = 0;
+				return;
+			};
+			getCss(moveBox);
+			//moveY = moveY + cssNum;
+			moveBox.style.transform = 'translateY(-'+oHeight*pageNum+'px)';
 		}else if(moveY < 0 && moveY < -10){
+			pageNum++;
 			console.log('动作是向下翻页');
-			getCss(targetBox);
-			moveY = moveY + cssNum;
-			targetBox.style.transform = 'translateY('+moveY+'px)';
+			if(pageNum >= getLen){
+				pageNum = getLen-1;	
+				return;
+			};
+			getCss(moveBox);
+			//moveY = moveY + cssNum;
+			moveBox.style.transform = 'translateY(-'+oHeight*pageNum+'px)';
 		}
+	}
+	function leftRight(e){
 		//判断手势滑动(左右滑动);
+		e = e || window.event;
+		var targetBox = e.target ? e.target:e.srcElement;
 		if(moveX > 0 && moveX > 10){
 			console.log('动作是向右滑动');
 			getCss(targetBox);
@@ -91,6 +124,10 @@
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
 		}
+	}
+	function page3D(e){
+		e = e || window.event;
+		var targetBox = e.target ? e.target:e.srcElement;
 		//判断手势滑动(左上左下);
 		if((moveX > 0 && moveY >0 ) && (moveX > 10 && moveY > 10)){
 			console.log('动作是左下滑动');
@@ -103,6 +140,6 @@
 		}else if((moveX < 0 && moveY < 0) && (moveX < -10 && moveY < -10)){
 			console.log('动作是右上滑动');
 		}
-	});
+	}
 </script>
 </html>
