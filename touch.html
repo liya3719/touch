@@ -29,14 +29,14 @@
 	<div class="wrap">
 		<div class="container">
 			<div class="space" id="move-box">
-				<div class="move"></div>
-				<div class="move"></div>
-				<div class="move"></div>
-				<div class="move"></div>
-				<div class="move"></div>
-				<div class="move"></div>
-				<div class="move"></div>
-				<div class="move"></div>
+				<div class="move" data-page="1"></div>
+				<div class="move" data-page="2"></div>
+				<div class="move" data-page="3"></div>
+				<div class="move" data-page="4"></div>
+				<div class="move" data-page="5"></div>
+				<div class="move" data-page="6"></div>
+				<div class="move" data-page="7"></div>
+				<div class="move" data-page="8"></div>
 			</div>
 		</div>
 	</div>
@@ -68,22 +68,32 @@
 		}
 	}
 	document.addEventListener('touchstart',function(e){
-		startX = e.touches[0].clientX;
-		startY = e.touches[0].clientY;
-		e.preventDefault();
+		onStart(e);
 	});
 	document.addEventListener('touchmove',function(e){
+		onMove(e);
+	});
+	document.addEventListener('touchend',function(e){
+		onEnd(e);
+	});
+	function onStart(e){
+		startX = e.touches[0].clientX;
+		startY = e.touches[0].clientY;
+		var getCssNum = moveBox.style.transform;
+		if(getCssNum !==''){
+			cssNum = + getCssNum.match(reg);
+		}
+		e.preventDefault();
+	}
+	function onMove(e){
 		endX = e.touches[0].clientX;
 		endY = e.touches[0].clientY;
 		e.preventDefault();
-	});
-	document.addEventListener('touchend',function(e){
-		e.preventDefault();
+	}
+	function onEnd(e){
 		moveX = endX - startX;
 		moveY = endY - startY;
-		upDown(e);
-	});
-	function upDown(e){
+		e.preventDefault();
 		//判断手势滑动(上下手势);
 		e = e || window.event;
 		var targetBox = e.target ? e.target:e.srcElement;
@@ -91,21 +101,20 @@
 			pageNum--;
 			console.log('动作是向上翻页');
 			if(pageNum < 0){
-				pageNum = 0;
+				moveBox.style.transform = 'translateY(0px)';
 				return;
 			};
 			getCss(moveBox);
-			//moveY = moveY + cssNum;
 			moveBox.style.transform = 'translateY(-'+oHeight*pageNum+'px)';
+
 		}else if(moveY < 0 && moveY < -10){
 			pageNum++;
 			console.log('动作是向下翻页');
 			if(pageNum >= getLen){
 				pageNum = getLen-1;	
 				return;
-			};
+			}
 			getCss(moveBox);
-			//moveY = moveY + cssNum;
 			moveBox.style.transform = 'translateY(-'+oHeight*pageNum+'px)';
 		}
 	}
