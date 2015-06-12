@@ -42,12 +42,14 @@
 	</div>
 </body>
 <script type="text/javascript">
+	var touch = ('ontouchstart' in document) ? 'touchstart' : 'onclick';
 	var startX = 0,
 		startY = 0,
 		endX = 0,
 		endY = 0,
 		moveX = 0,
 		moveY = 0,
+		touchUp = false,
 		//匹配DOM3级的正则
 		reg = /\-?[0-9]+\.?[0-9]*/g,
 		pageNum = 0;
@@ -67,68 +69,72 @@
 			cssNum = + getCssNum.match(reg);
 		}
 	}
-	document.addEventListener('touchstart',function(e){
-		onStart(e);
-	});
-	document.addEventListener('touchmove',function(e){
-		onMove(e);
-	});
-	document.addEventListener('touchend',function(e){
-		onEnd(e);
-	});
+	document.addEventListener('touchstart',onStart,false);
+	document.addEventListener('touchmove',onMove,false);
+	document.addEventListener('touchend',onEnd,false);
 	function onStart(e){
 		startX = e.touches[0].clientX;
 		startY = e.touches[0].clientY;
-		var getCssNum = moveBox.style.transform;
-		if(getCssNum !==''){
-			cssNum = + getCssNum.match(reg);
-		}
+		getCss(moveBox);
 		e.preventDefault();
 	}
 	function onMove(e){
-		endX = e.touches[0].clientX;
-		endY = e.touches[0].clientY;
+		moveX = e.touches[0].clientX;
+		moveY = e.touches[0].clientY;
 		e.preventDefault();
+		//bounce(e);
 	}
 	function onEnd(e){
-		moveX = endX - startX;
-		moveY = endY - startY;
+		if(moveX == 0 && moveY == 0)return;
+		endX = moveX - startX;
+		endY = moveY - startY;
 		e.preventDefault();
-		//判断手势滑动(上下手势);
-		e = e || window.event;
-		var targetBox = e.target ? e.target:e.srcElement;
-		if(moveY > 0 && moveY > 10){
-			pageNum--;
-			console.log('动作是向上翻页');
-			if(pageNum < 0){
-				moveBox.style.transform = 'translateY(0px)';
-				return;
-			};
-			getCss(moveBox);
-			moveBox.style.transform = 'translateY(-'+oHeight*pageNum+'px)';
-
-		}else if(moveY < 0 && moveY < -10){
-			pageNum++;
-			console.log('动作是向下翻页');
-			if(pageNum >= getLen){
-				pageNum = getLen-1;	
-				return;
-			}
-			getCss(moveBox);
-			moveBox.style.transform = 'translateY(-'+oHeight*pageNum+'px)';
+		//向上翻页
+		if(endY > 0 && endY > 10){
+			prevPage();
+		}else if(endY < 0 && endY < -10){
+			//向下翻页
+			nextPage();
 		}
 	}
+	function bounce(e){
+		if(pageNum == 0){
+			var temp = cssNum + e.pageY - startY;
+			moveBox.style.transform = 'translateY('+-temp+'px)';
+		}else if(pageNum >= getLen - 1){
+			var temp = cssNum + e.pageY - startY;
+			moveBox.style.transform = 'translateY('+temp+'px)';
+		}
+	}
+	function prevPage(){
+		var newPage = pageNum - 1;
+		animatePage(newPage);
+	}
+	function nextPage(){
+		var newPage = pageNum + 1;
+		animatePage(newPage);
+	}
+	function animatePage(newPage){
+		if(newPage < 0){
+			newPage = 0;
+		};
+		if(newPage > getLen - 1){
+			newPage  = getLen - 1;
+		}
+		pageNum = newPage;
+		var newMarginTop = newPage * -oHeight;
+		moveBox.style.transform = 'translateY('+newMarginTop+'px)';
+	}
 	function leftRight(e){
-		//判断手势滑动(左右滑动);
 		e = e || window.event;
 		var targetBox = e.target ? e.target:e.srcElement;
-		if(moveX > 0 && moveX > 10){
-			console.log('动作是向右滑动');
+		//向右滑动
+		if(endX > 0 && endX > 10){
 			getCss(targetBox);
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
-		}else if(moveX < 0 && moveX < -10){
-			console.log('动作是向左滑动');
+		}else if(endX < 0 && endX < -10){
+		//向左滑动
 			getCss(targetBox);
 			moveX = moveX + cssNum;
 			targetBox.style.transform = 'translateX('+moveX+'px)';
@@ -137,18 +143,23 @@
 	function page3D(e){
 		e = e || window.event;
 		var targetBox = e.target ? e.target:e.srcElement;
-		//判断手势滑动(左上左下);
-		if((moveX > 0 && moveY >0 ) && (moveX > 10 && moveY > 10)){
-			console.log('动作是左下滑动');
-		}else if((moveX > 0 && moveY < 0) && (moveX > 10 && moveY < -10)){
-			console.log('动作是左上滑动');
+		if((endX > 0 && endY >0 ) && (endX > 10 && endY > 10)){
+			//左下
+		}else if((endX > 0 && endY < 0) && (endX > 10 && endY < -10)){
+			//左上
 		}
-		//判断手势滑动(右上右下);
-		if((moveX < 0 && moveY > 0 ) && (moveX < -10 && moveY > 10)){
-			console.log('动作是右下滑动');
-		}else if((moveX < 0 && moveY < 0) && (moveX < -10 && moveY < -10)){
-			console.log('动作是右上滑动');
+		if((endX < 0 && endY > 0 ) && (endX < -10 && endY > 10)){
+			//右下
+		}else if((endX < 0 && endY < 0) && (endX < -10 && endY < -10)){
+			//右上
 		}
 	}
+</script>
+<script type="text/javascript">
+	var div = document.createElement('div');
+	var body = document.body || document.documentElement;
+div.style.cssText = 'display:none;position:fixed;z-index:100;';
+body.appendChild(div);
+console.log(window.getComputedStyle(div).position != 'fixed');
 </script>
 </html>
