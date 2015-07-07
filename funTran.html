@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<style type="text/css" media="screen">
+	#box{
+		position:absolute;
+		width:100px;
+		height:100px;
+		margin:0 auto;
+		background:orange;
+		-webkit-transition:position 1s;
+		transition:position 1s;
+	}
+</style>
+</head>
+<body>
+    <div id="box"></div>
+</body>
+<script type="text/javascript">
+	var oBox = document.getElementById('box');
+	function getByClass(claName,parent){
+		var oParent = parent ? document.getElementById(parent) : document,
+			elems = [],
+			lis = oParent.getElementByTagName('*'),
+			i;
+		for(i=0,l=lis.length;i<l;i++){
+			if(lis[i].className == claName){
+				elems.push(lis[i]);
+			}
+		}
+	}
+	oBox.onmousedown = fnDown;
+	function fnDown(e){
+		e = e || window.event;
+		var disX = e.clientX - oBox.offsetLeft,
+			disY = e.clientY - oBox.offsetTop;
+		console.log('clientX:%s,clientY:%s',disX,disY);
+		document.onmousemove = function(e){
+			e = e || window.event;
+			fnMove(e,disX,disY);
+		}
+	}
+	function fnMove(e,posX,posY){
+		var l = e.clientX - posX,
+			t = e.clientY - posY,
+			winW = document.documentElement.clientWidth || document.body.clientWidth,
+			winH = document.documentElement.clientHeight || document.body.clientHeight,
+			maxW = winW - oBox.offsetWidth,
+			maxH = winH - oBox.offsetHeight;
+		console.log('moveX:%s,moveY:%s',l,t);
+		if(l < 0){
+			l = 0;
+		}else if(l > maxW){
+			l = maxW;
+		}
+		if(t < 0){
+			t = 0
+		}else if(t > maxH){
+			t = maxH;
+		}
+		oBox.style.left = l +'px';
+		oBox.style.top = t + 'px';
+	}
+	oBox.onmouseup = function(){
+		document.onmousemove = null;
+		document.onmouseup = null;
+	}
+</script>
+</html>
