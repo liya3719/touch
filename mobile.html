@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+<style type="text/css" media="screen">
+	*{
+		margin:0;
+		padding:0;
+	}
+	.box{
+		position:absolute;
+		width:100px;
+		height:100px;
+		background:orange;
+	}
+</style>
+</head>
+<body>
+    <div class="box" id="box"></div>
+</body>
+<script>
+	var touchBox = document.getElementById('box');
+	var E = {
+		start: function(e) {
+			e = e || window.event;
+			var disX = e.touches[0].clientX - touchBox.offsetLeft,
+				disY = e.touches[0].clientY - touchBox.offsetTop;
+			console.log('disX:%s, disY:%s >>>>>>>>>>>>>>>start阶段获取盒子坐标偏移', disX, disY)
+			document.addEventListener('touchmove',function(e) {
+				e = e || window.event;
+				E.move(e, disX, disY);
+			}, false);
+		},
+		move: function(e, posX, posY) {
+			console.log('move阶段获取start传过来的参数',posX, posY)
+			var x = e.touches[0].clientX - posX;
+				y = e.touches[0].clientY - posY;
+			console.log('x:%s, y:%s >>>>>>>>>>>>>>move阶段x轴和y轴值', x, y)
+			var	winW = document.documentElement.clienWidth || document.body.clientWidth,
+				winH = document.documentElement.clientHeight || document.body.clientHeight,
+				maxW = winW - touchBox.offsetWidth,
+				maxH = winH - touchBox.offsetHeight;
+			//console.log('x:%s, y:%s, posX: %s, posY: %s', x, y, posX, posY);
+			if(x > maxW) {
+				x = maxW;
+			}else if(x < 0) { 
+				x = 0;
+			}
+
+			if(y > maxH) {
+				y = maxH;
+			}else if(y < 0) {
+				y = 0;
+			}
+			// touchBox.style.left = x + 'px'
+			// touchBox.style.top = y + 'px'
+			touchBox.style.transform = 'translate3D('+x+'px, '+y+'px, 0)';
+		},
+		end: function() {
+			document.removeEventListener('touchstart',E.start, true);
+			document.removeEventListener('touchmove', E.move, true);
+		}
+	}
+	touchBox.addEventListener('touchstart', E.start, false);
+	touchBox.addEventListener('touchend', function() {
+		E.end()
+	}, false);
+</script>
+</html>
