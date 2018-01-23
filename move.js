@@ -15,7 +15,6 @@ define(function(require,exports,module){
 			EndY = 0,
 			tapX = 0,
 			tapY = 0,
-			cssNum = 0,
 			anginX = 0,
 			anginY = 0,
 			bWidth = $('#touchBox').width(),
@@ -35,14 +34,10 @@ define(function(require,exports,module){
 			smallScale = $('#smallElem'),
 			rang = $('.thumbnail .range');
 		//获取当前X、Y轴偏移量
-		var cssObj = {X:'',Y:''};
+		var cssObj = {};
 		function getCss(){
-			cssNum = $(elem).css('-webkit-transform');
-			cssNum = cssNum.replace('translate3d(','');
-			cssNum = cssNum.replace(')','');
-			cssNum = cssNum.split(',');
-			cssObj.X = parseInt(cssNum[0],10);
-			cssObj.Y = parseInt(cssNum[1],10);
+			cssObj.X = elem.getBoundingClientRect().top;
+			cssObj.Y = elem.getBoundingClientRect().left;
 			return cssObj;
 		}
 		touchBox.addEventListener('touchstart',onStart,false);
@@ -125,14 +120,6 @@ define(function(require,exports,module){
 			anginY = moveY + cssObj.Y;
 			return true;
 		}
-	}
-	//获取Css3正则
-	module.exports.getCss = function(elem){
-		var reg = /\-?[0-9]+\.?[0-9]*/g;
-		var getCssNum = elem.style.transform;
-		if(getCssNum !==''){
-			cssNum = + getCssNum.match(reg);
-		};
 	}
 });
 
